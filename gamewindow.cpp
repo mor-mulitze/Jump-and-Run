@@ -8,7 +8,7 @@
 
 GameWindow::GameWindow(QWidget *parent)
     : QWidget(parent),
-    viereckX(100), viereckY(500),viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true)
+    viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0)
 {
     setFixedSize(1024, 512);  // Setzt die Fenstergröße
     startTimer(9);  // wie schnell das Spiel ist
@@ -42,6 +42,12 @@ void GameWindow::keyPressEvent(QKeyEvent *event)
         geschwindigkeitY = -30;  // Anfangsgeschwindigkeit des Sprungs (angepasst)
         onGround = false;
     }
+    if (event->key() == Qt::Key_A) {
+        geschwindigkeitX = -5; // Bewege nach links
+    }
+    if (event->key() == Qt::Key_D) {
+        geschwindigkeitX = 5; // Bewege nach rechts
+    }
 }
 
 void GameWindow::keyReleaseEvent(QKeyEvent *event)
@@ -49,6 +55,9 @@ void GameWindow::keyReleaseEvent(QKeyEvent *event)
     // Leertaste loslassen: Verhindern, dass das Viereck weiter nach oben schießt
     if (event->key() == Qt::Key_Space && geschwindigkeitY < 0) {
         geschwindigkeitY = 0;  // Stoppe das Springen, wenn die Taste losgelassen wird
+    }
+    if (event->key() == Qt::Key_A || event->key() == Qt::Key_D) {
+        geschwindigkeitX = 0; // Stoppe Bewegung, wenn Taste losgelassen wird
     }
 }
 
@@ -61,6 +70,11 @@ void GameWindow::timerEvent(QTimerEvent *event)
 
     // Position des Vierecks aktualisieren
     viereckY += geschwindigkeitY;
+    viereckX += geschwindigkeitX;
+
+    // Begrenzung, damit das Rechteck nicht aus dem Fenster läuft
+    if (viereckX < 0) viereckX = 0;
+    if (viereckX > width() - viereckB) viereckX = width() - viereckB;
 
     // Wenn das Viereck den Boden erreicht hat
     if (viereckY >= height() - 50) {
@@ -87,3 +101,5 @@ void GameWindow::timerEvent(QTimerEvent *event)
     }
     update();  // Das Fenster neu zeichnen
 }
+
+
