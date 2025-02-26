@@ -22,12 +22,13 @@ protected:
     void timerEvent(QTimerEvent *event) override;
 
 private:
-    int viereckX;               // X-Position des Vierecks
-    int viereckY;               // Y-Position des Vierecks
-    int viereckH;               // Höhe des Vierecks
-    int viereckB;               // Breite des Vierecks
+    int viereckX;              // X-Position des Vierecks
+    int viereckY;              // Y-Position des Vierecks
+    int viereckH;              // Höhe des Vierecks
+    int viereckB;              // Breite des Vierecks
     bool isJumping;            // Überprüft, ob das Viereck springt
-    int geschwindigkeitY;       // Geschwindigkeit in Y-Richtung (für Schwerkraft)
+    int geschwindigkeitY;      // Geschwindigkeit in Y-Richtung (für Schwerkraft)
+    int geschwindigkeitX;      // Geschwindigkeit in X-Richtung (seitliche Bewegung)
     bool onGround;             // Überprüft, ob das Viereck auf dem Boden ist
     QList<Obstacle> obstacles; // Liste der Hindernisse, jetzt Obstacle-Objekte
 };
