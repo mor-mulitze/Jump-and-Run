@@ -1,10 +1,10 @@
 #include <QApplication>
-#include "gamewindow.h"
+#include "menu.h"
 
-int main(int argc, char *argv[])
-{
-    QApplication a{argc, argv};
-    GameWindow w;
-    w.show();           // Öffne das Spiel-Fenster
-    return a.exec();    // Starte die Event-Schleife
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+    MainWindow window;
+    window.show();
+    return app.exec();
 }
