@@ -20,7 +20,7 @@ GameWindow::GameWindow(QWidget *parent)
     // Das Bild für den Spieler (Deklaration)
     QPixmap playerImage;
     // Bild für den Spieler laden
-    playerImage = QPixmap(":/Bilder/Spieler.jpg");  // Stelle sicher, dass der Pfad korrekt ist
+    playerImage = QPixmap(":/Grafik/Spieler.jpg");  // Stelle sicher, dass der Pfad korrekt ist
     if (playerImage.isNull()) {
         qDebug() << "Fehler: Spielerbild konnte nicht geladen werden!";
     }
@@ -28,7 +28,7 @@ GameWindow::GameWindow(QWidget *parent)
     // Das Bild für den Gegner (Deklaration)
     QPixmap obstacleImage;
     // Bild für das Hindernis laden
-    obstacleImage = QPixmap(":/Bilder/Gegner.jpg");  // Hindernisbild laden
+    obstacleImage = QPixmap(":/Grafik/Gegner.jpg");  // Hindernisbild laden
     if (obstacleImage.isNull()) {
         qDebug() << "Fehler: Gegnerbild konnte nicht geladen werden!";
     }
@@ -41,7 +41,7 @@ void GameWindow::paintEvent(QPaintEvent *event)
     QPainter Farbe(this); // QPainter ist von Qt selbst
 
     // Bild für den Hintergrund aus den Ressourcen laden
-    QPixmap background(":/Bilder/Hintergrund.jpg");
+    QPixmap background(":/Grafik/Background.png");
     // Das Bild als Hintergrund zeichnen
     Farbe.drawPixmap(0, 0, width(), height(), background);  // Das Bild auf die gesamte Fläche skalieren
 
