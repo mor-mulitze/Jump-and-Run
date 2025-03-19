@@ -5,10 +5,11 @@
 #include <QRandomGenerator>
 #include "obstacle.h"
 #include <QDebug>
+#include <QMessageBox>
 
 GameWindow::GameWindow(QWidget *parent)
     : QWidget(parent),
-    viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0)
+    viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0), gameOver(false)
 {
     setFixedSize(1024, 512);  // Setzt die Fenstergröße
     startTimer(9);  // wie schnell das Spiel ist
@@ -36,6 +37,19 @@ void GameWindow::paintEvent(QPaintEvent *event)
 
 void GameWindow::keyPressEvent(QKeyEvent *event)
 {
+    if (gameOver && event->key() == Qt::Key_R) {
+        // Spiel zurücksetzen
+        viereckX = 100;
+        viereckY = 500;
+        geschwindigkeitY = 3;
+        gameOver = false;
+        obstacles.clear();
+        obstacles.append(Obstacle(500, 512, 50, 50)); // Hindernis neu setzen
+
+        update();
+        return;
+    }
+
     if (event->key() == Qt::Key_Space && !isJumping && onGround) {
         // Nur springen, wenn das Viereck auf dem Boden ist und nicht bereits springt
         isJumping = true;
@@ -63,6 +77,10 @@ void GameWindow::keyReleaseEvent(QKeyEvent *event)
 
 void GameWindow::timerEvent(QTimerEvent *event)
 {
+    if (gameOver) {
+        return; // Falls das Spiel vorbei ist, keine Updates mehr machen
+    }
+
     // Schwerkraft anwenden (geschwindigkeitY wird in jedem Frame erhöht)
     if (!onGround) {
         geschwindigkeitY += 1;  // Schwerkraft anwenden (angepasst)
@@ -96,7 +114,12 @@ void GameWindow::timerEvent(QTimerEvent *event)
     for (const Obstacle &obstacle : obstacles) {
         if (playerRect.intersects(obstacle.getRect())) {
             // Kollision erkannt!
-            qDebug() << "Kollision erkannt!";
+            qDebug() << "Du bist tot!";
+            gameOver = true; // Spiel pausieren
+
+            // Nachricht anzeigen
+            QMessageBox::information(this, "Game Over", "Du bist tot! Drücke R, um neu zu starten.");
+
         }
     }
     update();  // Das Fenster neu zeichnen
