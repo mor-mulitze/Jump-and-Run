@@ -9,6 +9,8 @@
 
 class GameWindow : public QWidget
 {
+private:
+    bool gameOver; // Speichert, ob das Spiel pausiert wurde (tot)
     Q_OBJECT
 
 public:
