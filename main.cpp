@@ -3,8 +3,8 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication a{argc, argv};
     GameWindow w;
-    w.show();  // Öffne das Spiel-Fenster
-    return a.exec();  // Starte die Event-Schleife
+    w.show();           // Öffne das Spiel-Fenster
+    return a.exec();    // Starte die Event-Schleife
 }
