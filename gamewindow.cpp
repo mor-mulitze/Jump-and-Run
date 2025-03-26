@@ -2,7 +2,6 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QTimerEvent>
-#include <QRandomGenerator>
 #include "obstacle.h"
 #include <QDebug>
 
@@ -10,8 +9,8 @@ GameWindow::GameWindow(QWidget *parent)
     : QWidget(parent),
     viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0)
 {
-    setFixedSize(1024, 512);  // Setzt die Fenstergröße
-    startTimer(9);  // wie schnell das Spiel ist
+    setFixedSize(1024, 512);        // Setzt die Fenstergröße
+    startTimer(9);                  // wie schnell das Spiel ist
 
     // Initiales Hindernis
     obstacles.append(Obstacle(500, 512, 50, 50));  // Erstes Hindernis rechts außerhalb des Bildschirms
@@ -42,9 +41,11 @@ void GameWindow::keyPressEvent(QKeyEvent *event)
         geschwindigkeitY = -30;  // Anfangsgeschwindigkeit des Sprungs (angepasst)
         onGround = false;
     }
+
     if (event->key() == Qt::Key_A) {
         geschwindigkeitX = -5; // Bewege nach links
     }
+
     if (event->key() == Qt::Key_D) {
         geschwindigkeitX = 5; // Bewege nach rechts
     }
@@ -56,6 +57,7 @@ void GameWindow::keyReleaseEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Space && geschwindigkeitY < 0) {
         geschwindigkeitY = 0;  // Stoppe das Springen, wenn die Taste losgelassen wird
     }
+
     if (event->key() == Qt::Key_A || event->key() == Qt::Key_D) {
         geschwindigkeitX = 0; // Stoppe Bewegung, wenn Taste losgelassen wird
     }
@@ -65,7 +67,7 @@ void GameWindow::timerEvent(QTimerEvent *event)
 {
     // Schwerkraft anwenden (geschwindigkeitY wird in jedem Frame erhöht)
     if (!onGround) {
-        geschwindigkeitY += 1;  // Schwerkraft anwenden (angepasst)
+        geschwindigkeitY += 1;          // Schwerkraft anwenden (angepasst)
     }
 
     // Position des Vierecks aktualisieren
@@ -78,16 +80,16 @@ void GameWindow::timerEvent(QTimerEvent *event)
 
     // Wenn das Viereck den Boden erreicht hat
     if (viereckY >= height() - 50) {
-        viereckY = height() - 50;  // Das Viereck darf nicht unter den Boden gehen
-        onGround = true;  // Es steht jetzt auf dem Boden
-        geschwindigkeitY = 0;  // Stoppe die Bewegung in Y-Richtung
-        isJumping = false;  // Jetzt kann wieder gesprungen werden
+        viereckY = height() - 50;       // Das Viereck darf nicht unter den Boden gehen
+        onGround = true;                // Es steht jetzt auf dem Boden
+        geschwindigkeitY = 0;           // Stoppe die Bewegung in Y-Richtung
+        isJumping = false;              // Jetzt kann wieder gesprungen werden
     }
 
     // Hindernisse bewegen (von rechts nach links)
     for (Obstacle &obstacle : obstacles) {
-        obstacle.move();  // Bewege das Hindernis
-        obstacle.reset(width(), height());  // Setze es neu, wenn es den Bildschirm verlässt
+        obstacle.move();                         // Bewege das Hindernis
+        obstacle.reset(width(), height());       // Setze es neu, wenn es den Bildschirm verlässt
     }
 
     QRect playerRect(viereckX, viereckY, viereckB, viereckH);
