@@ -4,5 +4,6 @@
         <file>graphics/Background/Background_v1-1.png</file>
         <file>graphics/Character/stand-still_v1-1.png</file>
         <file>graphics/Background/Background_v2-0.png</file>
+        <file>graphics/Background/Background_v2-1.png</file>
     </qresource>
 </RCC>
