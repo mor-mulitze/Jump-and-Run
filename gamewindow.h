@@ -34,9 +34,10 @@ private:
 
     QList<Obstacle> obstacles;  // Liste der Hindernisse, jetzt Obstacle-Objekte
     QPixmap playerSprite;  // Sprite für den Spieler
-
+    bool gamePaused;  // Deklariere die gamePaused-Variable hier
     // 🆕 Funktion für pixelgenaue Kollisionserkennung
     bool checkCollisionPixelBased(const QRect &playerRect, const Obstacle &obstacle);
+    void handleCollision(const QRect &playerRect, const Obstacle &obstacle);
 };
 
 #endif // GAMEWINDOW_H
