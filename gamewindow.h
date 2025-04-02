@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <QTimerEvent>
 #include <QList>
+#include <QRect>
 #include "obstacle.h"  // Füge die Hindernis-Klasse hinzu
 
 class GameWindow : public QWidget
