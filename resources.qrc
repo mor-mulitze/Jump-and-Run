@@ -1,8 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>Grafik/Background.png</file>
-        <file>Grafik/firsttry.png</file>
-        <file>Grafik/Gegner.jpg</file>
-        <file>Grafik/Spieler.jpg</file>
+        <file>graphics/Background/Background.png</file>
+        <file>graphics/Background/Background_v1-1.png</file>
+        <file>graphics/Character/stand-still_v1-1.png</file>
+        <file>graphics/Background/Background_v2-0.png</file>
     </qresource>
 </RCC>
