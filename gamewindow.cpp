@@ -8,14 +8,9 @@
 
 GameWindow::GameWindow(QWidget *parent)
     : QWidget(parent),
-    viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0)
+    viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0), gamePaused(false)
 {
     setFixedSize(1024, 512);  // Setzt die Fenstergröße
-    if (!playerSprite.load(":/graphics/Character/stand-still_v1-1.png")) {
-        qDebug() << "❌ Fehler: Spieler-Sprite konnte nicht geladen werden!";
-    } else {
-        qDebug() << "✅ Spieler-Sprite erfolgreich geladen!";
-    }
     startTimer(9);  // Geschwindigkeit des Spiels
 
 
@@ -44,10 +39,35 @@ void GameWindow::paintEvent(QPaintEvent *event)
     for (const Obstacle &obstacle : obstacles) {
         Farbe.drawRect(obstacle.getRect());
     }
+
+    if (gamePaused) {
+        // Setzt eine transparente Farbe für das Overlay
+        Farbe.setBrush(QColor(0, 0, 0, 100));  // Transparente schwarze Farbe für das Overlay
+        Farbe.drawRect(0, 0, width(), height()); // Über das gesamte Fenster
+
+        // Setzt die Textfarbe auf weiß und zeigt die Pause-Nachricht an
+        Farbe.setPen(Qt::white);
+        Farbe.setFont(QFont("Arial", 20));
+        Farbe.drawText(width() / 2 - 100, height() / 2, "Spiel Pausiert! Drücke 'R' zum Fortsetzen.");
+    }
 }
 
 void GameWindow::keyPressEvent(QKeyEvent *event)
 {
+    if (gamePaused) {
+        // Wenn das Spiel pausiert ist, drücke 'R', um fortzufahren
+        if (event->key() == Qt::Key_R) {
+            gamePaused = false;
+
+            // Nach dem Fortsetzen, zurücksetzen der Schwerkraft und der Boden-Erkennung
+            geschwindigkeitY = 3;
+            onGround = true;
+
+            update(); // Das Spiel wieder aktualisieren
+        }
+        return;
+    }
+
     if (event->key() == Qt::Key_Space && !isJumping && onGround) {
         isJumping = true;
         geschwindigkeitY = -30;
@@ -76,6 +96,9 @@ void GameWindow::keyReleaseEvent(QKeyEvent *event)
 
 void GameWindow::timerEvent(QTimerEvent *event)
 {
+    if (gamePaused) {
+        return; // Wenn das Spiel pausiert ist, keine Updates durchführen
+    }
 
     if (!onGround) {
 
@@ -85,9 +108,11 @@ void GameWindow::timerEvent(QTimerEvent *event)
     viereckY += geschwindigkeitY;
     viereckX += geschwindigkeitX;
 
+    // Grenzwerte für den Spieler
     if (viereckX < 0) viereckX = 0;
     if (viereckX > width() - viereckB) viereckX = width() - viereckB;
 
+    // Überprüfen, ob der Spieler den Boden berührt
     if (viereckY >= height() - 50) {
 
         viereckY = height() - 50;       // Das Viereck darf nicht unter den Boden gehen
@@ -96,6 +121,7 @@ void GameWindow::timerEvent(QTimerEvent *event)
         isJumping = false;              // Jetzt kann wieder gesprungen werden
     }
 
+    // Bewegungen der Hindernisse
     for (Obstacle &obstacle : obstacles) {
 
         obstacle.move();                         // Bewege das Hindernis
@@ -104,15 +130,14 @@ void GameWindow::timerEvent(QTimerEvent *event)
 
     QRect playerRect(viereckX, viereckY, viereckB, viereckH);
 
+    // Überprüfe jede Kollision
     for (const Obstacle &obstacle : obstacles) {
         if (checkCollisionPixelBased(playerRect, obstacle)) {
             qDebug() << "💥 Kollision erkannt! Spieler bei:" << viereckX << viereckY
                      << "| Hindernis bei:" << obstacle.getRect();
-        } else {
-            qDebug() << "❌ Keine Kollision. Spieler bei:" << viereckX << viereckY
-                     << "| Hindernis bei:" << obstacle.getRect();
+            gamePaused = true;  // Spiel pausieren
+            handleCollision(playerRect, obstacle); // Kollision behandeln
         }
-
     }
 
     update();
@@ -127,19 +152,6 @@ bool GameWindow::checkCollisionPixelBased(const QRect &playerRect, const Obstacl
         return false;  // Keine Kollision, also keine weitere Prüfung nötig
     }
 
-    // Spieler-Sprite als Bild rendern
-    QImage playerImage(viereckB, viereckH, QImage::Format_ARGB32);
-    playerImage.fill(Qt::transparent);
-    QPainter playerPainter(&playerImage);
-    playerPainter.drawPixmap(0, 0, viereckB, viereckH, playerSprite);
-
-    // Hindernis als Bild rendern
-    QImage obstacleImage(obstacleRect.width(), obstacleRect.height(), QImage::Format_ARGB32);
-    obstacleImage.fill(Qt::transparent);
-    QPainter obstaclePainter(&obstacleImage);
-    obstaclePainter.setBrush(Qt::red);
-    obstaclePainter.drawRect(0, 0, obstacleRect.width(), obstacleRect.height());
-
     // Berechnung der überlappenden Region
     int startX = std::max(playerRect.left(), obstacleRect.left());
     int startY = std::max(playerRect.top(), obstacleRect.top());
@@ -149,21 +161,35 @@ bool GameWindow::checkCollisionPixelBased(const QRect &playerRect, const Obstacl
     // Überprüfung nur in der überlappenden Region
     for (int x = startX; x <= endX; ++x) {
         for (int y = startY; y <= endY; ++y) {
-            int playerLocalX = x - playerRect.left();
-            int playerLocalY = y - playerRect.top();
-            int obstacleLocalX = x - obstacleRect.left();
-            int obstacleLocalY = y - obstacleRect.top();
-
-            QColor playerColor = playerImage.pixelColor(playerLocalX, playerLocalY);
-            QColor obstacleColor = obstacleImage.pixelColor(obstacleLocalX, obstacleLocalY);
-
-            if (playerColor.alpha() > 0 && obstacleColor.alpha() > 0) {
+            // Spieler Rechteck und Hindernis Rechteck im Bereich des Überlappings überprüfen
+            if (playerRect.contains(x, y) && obstacleRect.contains(x, y)) {
                 qDebug() << "🎯 Pixel-Kollision erkannt bei" << x << y;
-                return true;
+                return true;  // Kollision erkannt
             }
         }
     }
 
-    return false;
+    return false;  // Keine Kollision
 }
 
+void GameWindow::handleCollision(const QRect &playerRect, const Obstacle &obstacle)
+{
+    // Beispielhafte Korrektur: Spieler nach der Kollision an die Kante des Hindernisses setzen
+    QRect obstacleRect = obstacle.getRect();
+
+    // Wenn der Spieler das Hindernis von unten trifft, setze den Spieler auf die Oberkante des Hindernisses
+    if (playerRect.bottom() > obstacleRect.top() && playerRect.top() < obstacleRect.top()) {
+        viereckY = obstacleRect.top() - viereckH;
+        geschwindigkeitY = 0;
+        onGround = true;
+    }
+
+    // Wenn der Spieler das Hindernis von der Seite trifft, setze die horizontale Position zurück
+    if (playerRect.right() > obstacleRect.left() && playerRect.left() < obstacleRect.right()) {
+        if (geschwindigkeitX > 0) {  // Rechts treffen
+            viereckX = obstacleRect.left() - viereckB;
+        } else if (geschwindigkeitX < 0) {  // Links treffen
+            viereckX = obstacleRect.right();
+        }
+    }
+}
