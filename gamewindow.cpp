@@ -27,7 +27,7 @@ void GameWindow::paintEvent(QPaintEvent *event)
 
 
     // Hintergrundbild laden und zeichnen
-    QPixmap background(":/graphics/Background/Background_v2-0.png"); // Hier wird das Bild aus Ressourcen geladen
+    QPixmap background(":/graphics/Background/Background_v2-1.png"); // Hier wird das Bild aus Ressourcen geladen
     Farbe.drawPixmap(0, 0, width(), height(), background); // Das Bild wird auf die ganze Fenstergröße skaliert
 
 
