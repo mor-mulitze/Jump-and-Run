@@ -39,6 +39,7 @@ private:
     // 🆕 Funktion für pixelgenaue Kollisionserkennung
     bool checkCollisionPixelBased(const QRect &playerRect, const Obstacle &obstacle);
     void handleCollision(const QRect &playerRect, const Obstacle &obstacle);
+    QRect plattform;
 };
 
 #endif // GAMEWINDOW_H
