@@ -5,6 +5,7 @@
 #include "obstacle.h"
 #include <QDebug>
 #include <QRect>
+#include <QRandomGenerator>
 #include <QPixmap>  // Für QPixmap zum Laden des Bildes
 
 GameWindow::GameWindow(QWidget *parent)
@@ -13,7 +14,7 @@ GameWindow::GameWindow(QWidget *parent)
     plattform{300, 350, 200, 20}
 {
     setFixedSize(1024, 512);  // Setzt die Fenstergröße
-    startTimer(15);  // Geschwindigkeit des Spiels
+    startTimer(30);  // Geschwindigkeit des Spiels
 
 
     // Initiales Hindernis
@@ -100,6 +101,12 @@ void GameWindow::keyReleaseEvent(QKeyEvent *event)
 
 void GameWindow::timerEvent(QTimerEvent *event)
 {
+    // In regelmäßigen Abständen neue Gegner erzeugen
+    if (QRandomGenerator::global()->bounded(100) < 2) {
+        int zufallsY = height() - 50;  // Gegner startet auf dem Boden
+        obstacles.append(Obstacle(width(), zufallsY, 50, 50));
+    }
+
     if (gamePaused) {
         return; // Wenn das Spiel pausiert ist, keine Updates durchführen
     }
@@ -148,6 +155,16 @@ void GameWindow::timerEvent(QTimerEvent *event)
             handleCollision(playerRect, obstacle); // Kollision behandeln
         }
     }
+    for (int i = 0; i < obstacles.size(); ++i) {
+        obstacles[i].move();
+
+        // Wenn das Hindernis den linken Rand verlässt, löschen
+        if (obstacles[i].getRect().right() < 0) {
+            obstacles.removeAt(i);
+            --i; // Listenindex anpassen
+        }
+    }
+
 
     update();
 }
