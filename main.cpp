@@ -1,3 +1,9 @@
+/*
+ * Entwickler:
+ * Tobias Hagenucher
+ */
+
+
 #include <QApplication>
 #include "gamewindow.h"
 
