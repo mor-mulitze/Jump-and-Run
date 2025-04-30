@@ -1,3 +1,8 @@
+/*
+ * Entwickler:
+ * Hans Wurst
+ */
+
 #include <QApplication>
 #include "gamewindow.h"
 
