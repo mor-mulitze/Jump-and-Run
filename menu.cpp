@@ -2,6 +2,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QPainter>
+
 #include "gamewindow.h"
 
 #include "menu.h"
@@ -52,6 +54,17 @@ void MainWindow::startGame() {
 void MainWindow::showHighscore() {
     QMessageBox::information(this, "Highscore", "Displaying high scores...");
 }
+
+void MainWindow::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    QPixmap background(":/grafics/Background/Background_v1-1.png");
+
+    // Zeichnet das Bild über das gesamte Fenster
+    painter.drawPixmap(0, 0, width(), height(), background);
+
+    QWidget::paintEvent(event); // Basis-Methode aufrufen
+}
+
 /*
  * Hinzufügen des Hintergrundes.
 

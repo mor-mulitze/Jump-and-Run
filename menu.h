@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QPainter>
 #include "gamewindow.h"
 
 class MainWindow : public QWidget {
@@ -13,6 +14,9 @@ class MainWindow : public QWidget {
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
 
 private slots:
     void startGame();
