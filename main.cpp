@@ -1,7 +1,4 @@
-/*
- * Entwickler:
- * Tobias Hagenucher
- */
+
 
 
 #include <QApplication>
