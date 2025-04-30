@@ -40,6 +40,12 @@ private:
     bool checkCollisionPixelBased(const QRect &playerRect, const Obstacle &obstacle);
     void handleCollision(const QRect &playerRect, const Obstacle &obstacle);
     QRect plattform;
+
+    int currentFrame;
+    int frameWidth;
+    int frameHeight;
+    int animationCounter;
+
 };
 
 #endif // GAMEWINDOW_H

@@ -12,7 +12,12 @@
 GameWindow::GameWindow(QWidget *parent)
     : QWidget(parent),
     viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0), gamePaused(false),
-    plattform{300, 350, 200, 20}
+    plattform{300, 350, 200, 20},
+    playerSprite(":/graphics/Character/stand-still_v1-1.png"),
+    currentFrame{0},
+    frameWidth{200},
+    frameHeight{200},
+    animationCounter{0}
 {
 
     setFixedSize(1024, 512);  // Setzt die Fenstergröße
@@ -36,10 +41,13 @@ void GameWindow::paintEvent(QPaintEvent *event)
     QPixmap background(":/graphics/Background/Background_v2-1.png"); // Hier wird das Bild aus Ressourcen geladen
     Farbe.drawPixmap(0, 0, width(), height(), background); // Das Bild wird auf die ganze Fenstergröße skaliert
 
-
+    //Zeichne den Mexikaner
+    QRect sourceRect(currentFrame * frameWidth, 0, frameWidth, frameHeight);
+    QRect targetRect(viereckX, viereckY, viereckB, viereckH);
+    Farbe.drawPixmap(targetRect, playerSprite, sourceRect);
     // Zeichne den Spieler (grünes Rechteck)
-    Farbe.setBrush(Qt::green);
-    Farbe.drawRect(viereckX, viereckY, viereckB, viereckH);
+    /*Farbe.setBrush(Qt::green);
+    Farbe.drawRect(viereckX, viereckY, viereckB, viereckH);*/
 
     // Zeichne Hindernisse (rote Rechtecke)
     Farbe.setBrush(Qt::red);
@@ -150,6 +158,7 @@ void GameWindow::timerEvent(QTimerEvent *event)
         onGround = true;
         geschwindigkeitY = 0;
         isJumping = false;}
+
     // Überprüfe jede Kollision
     for (const Obstacle &obstacle : obstacles) {
         if (checkCollisionPixelBased(playerRect, obstacle)) {
