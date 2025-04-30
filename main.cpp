@@ -1,3 +1,6 @@
+/*
+ Anna
+ * */
 #include <QApplication>
 #include "gamewindow.h"
 
