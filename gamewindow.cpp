@@ -6,17 +6,25 @@
 #include <QDebug>
 #include <QRect>
 #include <QPixmap>  // Für QPixmap zum Laden des Bildes
+#include <QElapsedTimer>
+#include <QRandomGenerator>  // Für moderne Zufallszahlen
+
 
 GameWindow::GameWindow(QWidget *parent)
     : QWidget(parent),
-    viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0), gamePaused(false),
-    plattform{300, 350, 200, 20}
+    viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0), gamePaused(false)
 {
     setFixedSize(1024, 512);        // Setzt die Fenstergröße
     startTimer(15);                  // wie schnell das Spiel ist
+    spielTimer.start();             // Timer wird getartet
 
     // Initiales Hindernis
     obstacles.append(Obstacle(500, 512, 50, 50));
+
+    // 🆕 Erste Plattform zufällig erzeugen (breiter & nicht zu hoch)
+    int breite = 150 + QRandomGenerator::global()->bounded(100); // 150–249 px
+    int y = 300 + QRandomGenerator::global()->bounded(150);      // Höhe zwischen 300–449
+    plattformen.append(QRect(width(), y, breite, 20));
 }
 
 GameWindow::~GameWindow() {}
@@ -25,11 +33,9 @@ void GameWindow::paintEvent(QPaintEvent *event)
 {
     QPainter Farbe(this);
 
-
     // Hintergrundbild laden und zeichnen
     QPixmap background(":/graphics/Background/Background_v2-1.png"); // Hier wird das Bild aus Ressourcen geladen
     Farbe.drawPixmap(0, 0, width(), height(), background); // Das Bild wird auf die ganze Fenstergröße skaliert
-
 
     // Zeichne den Spieler (grünes Rechteck)
     Farbe.setBrush(Qt::green);
@@ -51,8 +57,25 @@ void GameWindow::paintEvent(QPaintEvent *event)
         Farbe.setFont(QFont("Arial", 20));
         Farbe.drawText(width() / 2 - 100, height() / 2, "Spiel Pausiert! Drücke 'R' zum Fortsetzen.");
     }
+
+    // Zeit berechnen
+    qint64 ms = spielTimer.elapsed();
+    double sekunden = ms / 1000.0;
+
+    // Text formatieren
+    QString zeitText = QString("Zeit: %1 s").arg(QString::number(sekunden, 'f', 2));
+
+    // Zeit oben rechts anzeigen
+    Farbe.setPen(Qt::white);
+    Farbe.setFont(QFont("Arial", 14, QFont::Bold));
+    int textBreite = Farbe.fontMetrics().horizontalAdvance(zeitText);
+    Farbe.drawText(width() - textBreite - 10, 30, zeitText);
+
+    // 🆕 Zeichne Plattformen (blaue Rechtecke)
     Farbe.setBrush(Qt::blue);
-    Farbe.drawRect(plattform);
+    for (const QRect &plattform : plattformen) {
+        Farbe.drawRect(plattform);
+    }
 }
 
 void GameWindow::keyPressEvent(QKeyEvent *event)
@@ -104,7 +127,6 @@ void GameWindow::timerEvent(QTimerEvent *event)
     }
 
     if (!onGround) {
-
         geschwindigkeitY += 1;          // Schwerkraft anwenden (angepasst)
     }
 
@@ -117,7 +139,6 @@ void GameWindow::timerEvent(QTimerEvent *event)
 
     // Überprüfen, ob der Spieler den Boden berührt
     if (viereckY >= height() - 50) {
-
         viereckY = height() - 50;       // Das Viereck darf nicht unter den Boden gehen
         onGround = true;                // Es steht jetzt auf dem Boden
         geschwindigkeitY = 0;           // Stoppe die Bewegung in Y-Richtung
@@ -126,19 +147,34 @@ void GameWindow::timerEvent(QTimerEvent *event)
 
     // Bewegungen der Hindernisse
     for (Obstacle &obstacle : obstacles) {
-
         obstacle.move();                         // Bewege das Hindernis
         obstacle.reset(width(), height());       // Setze es neu, wenn es den Bildschirm verlässt
     }
 
+    // 🆕 Plattformen bewegen und bei Bedarf neu generieren
+    for (int i = 0; i < plattformen.size(); ++i) {
+        plattformen[i].translate(-5, 0);  // Plattform nach links bewegen
+
+        if (plattformen[i].right() < 0) {
+            int neueBreite = 150 + QRandomGenerator::global()->bounded(100); // 150–249
+            int neueY = 300 + QRandomGenerator::global()->bounded(150);      // 300–449
+            plattformen[i] = QRect(width(), neueY, neueBreite, 20);
+        }
+    }
+
     QRect playerRect(viereckX, viereckY, viereckB, viereckH);
 
-    if (playerRect.intersects(plattform) && geschwindigkeitY > 0) {
-        viereckY = plattform.y() - viereckH; // Spieler landet auf Plattform
-        onGround = true;
-        geschwindigkeitY = 0;
-        isJumping = false;}
-    // Überprüfe jede Kollision
+    // 🆕 Kollision mit Plattformen
+    for (const QRect &plattform : plattformen) {
+        if (playerRect.intersects(plattform) && geschwindigkeitY > 0) {
+            viereckY = plattform.y() - viereckH; // Spieler landet auf Plattform
+            onGround = true;
+            geschwindigkeitY = 0;
+            isJumping = false;
+        }
+    }
+
+    // Überprüfe jede Kollision mit Hindernissen
     for (const Obstacle &obstacle : obstacles) {
         if (checkCollisionPixelBased(playerRect, obstacle)) {
             qDebug() << "💥 Kollision erkannt! Spieler bei:" << viereckX << viereckY
@@ -169,7 +205,6 @@ bool GameWindow::checkCollisionPixelBased(const QRect &playerRect, const Obstacl
     // Überprüfung nur in der überlappenden Region
     for (int x = startX; x <= endX; ++x) {
         for (int y = startY; y <= endY; ++y) {
-            // Spieler Rechteck und Hindernis Rechteck im Bereich des Überlappings überprüfen
             if (playerRect.contains(x, y) && obstacleRect.contains(x, y)) {
                 qDebug() << "🎯 Pixel-Kollision erkannt bei" << x << y;
                 return true;  // Kollision erkannt
@@ -182,21 +217,18 @@ bool GameWindow::checkCollisionPixelBased(const QRect &playerRect, const Obstacl
 
 void GameWindow::handleCollision(const QRect &playerRect, const Obstacle &obstacle)
 {
-    // Beispielhafte Korrektur: Spieler nach der Kollision an die Kante des Hindernisses setzen
     QRect obstacleRect = obstacle.getRect();
 
-    // Wenn der Spieler das Hindernis von unten trifft, setze den Spieler auf die Oberkante des Hindernisses
     if (playerRect.bottom() > obstacleRect.top() && playerRect.top() < obstacleRect.top()) {
         viereckY = obstacleRect.top() - viereckH;
         geschwindigkeitY = 0;
         onGround = true;
     }
 
-    // Wenn der Spieler das Hindernis von der Seite trifft, setze die horizontale Position zurück
     if (playerRect.right() > obstacleRect.left() && playerRect.left() < obstacleRect.right()) {
-        if (geschwindigkeitX > 0) {  // Rechts treffen
+        if (geschwindigkeitX > 0) {
             viereckX = obstacleRect.left() - viereckB;
-        } else if (geschwindigkeitX < 0) {  // Links treffen
+        } else if (geschwindigkeitX < 0) {
             viereckX = obstacleRect.right();
         }
     }
