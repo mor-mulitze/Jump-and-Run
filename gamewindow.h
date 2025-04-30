@@ -41,10 +41,14 @@ private:
     void handleCollision(const QRect &playerRect, const Obstacle &obstacle);
     QRect plattform;
 
+
     int currentFrame;
     int frameWidth;
     int frameHeight;
     int animationCounter;
+
+    QElapsedTimer spielTimer;
+
 
 };
 

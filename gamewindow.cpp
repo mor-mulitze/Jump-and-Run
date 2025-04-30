@@ -8,6 +8,7 @@
 #include <QRandomGenerator>
 
 #include <QPixmap>  // Für QPixmap zum Laden des Bildes
+#include <QElapsedTimer>
 
 GameWindow::GameWindow(QWidget *parent)
     : QWidget(parent),
@@ -20,10 +21,9 @@ GameWindow::GameWindow(QWidget *parent)
     animationCounter{0}
 {
 
-    setFixedSize(1024, 512);  // Setzt die Fenstergröße
-    startTimer(30);  // Geschwindigkeit des Spiels
-
-    
+    setFixedSize(1024, 512);        // Setzt die Fenstergröße
+    startTimer(15);                  // wie schnell das Spiel ist
+    spielTimer.start();             // Timer wird getartet
 
 
     // Initiales Hindernis
@@ -65,6 +65,20 @@ void GameWindow::paintEvent(QPaintEvent *event)
         Farbe.setFont(QFont("Arial", 20));
         Farbe.drawText(width() / 2 - 100, height() / 2, "Spiel Pausiert! Drücke 'R' zum Fortsetzen.");
     }
+
+    // Zeit berechnen
+    qint64 ms = spielTimer.elapsed();
+    double sekunden = ms / 1000.0;
+
+    // Text formatieren
+    QString zeitText = QString("Zeit: %1 s").arg(QString::number(sekunden, 'f', 2));
+
+    // Zeit oben rechts anzeigen
+    Farbe.setPen(Qt::white);
+    Farbe.setFont(QFont("Arial", 14, QFont::Bold));
+    int textBreite = Farbe.fontMetrics().horizontalAdvance(zeitText);
+    Farbe.drawText(width() - textBreite - 10, 30, zeitText);
+
     Farbe.setBrush(Qt::blue);
     Farbe.drawRect(plattform);
 }
