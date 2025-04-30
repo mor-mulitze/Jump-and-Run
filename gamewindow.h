@@ -41,6 +41,7 @@ private:
     void handleCollision(const QRect &playerRect, const Obstacle &obstacle);
     QRect plattform;
     QElapsedTimer spielTimer;
+    QList<QRect> plattformen;
 
 };
 
