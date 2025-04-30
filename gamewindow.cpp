@@ -201,3 +201,5 @@ void GameWindow::handleCollision(const QRect &playerRect, const Obstacle &obstac
         }
     }
 }
+
+

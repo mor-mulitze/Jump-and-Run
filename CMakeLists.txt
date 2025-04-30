@@ -26,6 +26,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         gamewindow.h
         gamewindow.cpp
         obstacle.h obstacle.cpp
+        menu.h menu.cpp
         resources.qrc
         menu.h menu.cpp
     )
