@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QRect>
 #include <QRandomGenerator>
+
 #include <QPixmap>  // Für QPixmap zum Laden des Bildes
 
 GameWindow::GameWindow(QWidget *parent)
@@ -13,8 +14,11 @@ GameWindow::GameWindow(QWidget *parent)
     viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0), gamePaused(false),
     plattform{300, 350, 200, 20}
 {
+
     setFixedSize(1024, 512);  // Setzt die Fenstergröße
     startTimer(30);  // Geschwindigkeit des Spiels
+
+    
 
 
     // Initiales Hindernis
@@ -29,7 +33,7 @@ void GameWindow::paintEvent(QPaintEvent *event)
 
 
     // Hintergrundbild laden und zeichnen
-    QPixmap background(":/graphics/Background/Background_v2-0.png"); // Hier wird das Bild aus Ressourcen geladen
+    QPixmap background(":/graphics/Background/Background_v2-1.png"); // Hier wird das Bild aus Ressourcen geladen
     Farbe.drawPixmap(0, 0, width(), height(), background); // Das Bild wird auf die ganze Fenstergröße skaliert
 
 
