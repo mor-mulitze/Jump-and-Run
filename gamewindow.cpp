@@ -11,7 +11,7 @@
 
 
 GameWindow::GameWindow(QWidget *parent)
-    : QWidget(parent),
+    : QWidget{parent},
     viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0), gamePaused(false)
 {
     setFixedSize(1024, 512);        // Setzt die Fenstergröße
@@ -31,7 +31,7 @@ GameWindow::~GameWindow() {}
 
 void GameWindow::paintEvent(QPaintEvent *event)
 {
-    QPainter Farbe(this);
+    QPainter Farbe{this};
 
     // Hintergrundbild laden und zeichnen
     QPixmap background(":/graphics/Background/Background_v2-1.png"); // Hier wird das Bild aus Ressourcen geladen

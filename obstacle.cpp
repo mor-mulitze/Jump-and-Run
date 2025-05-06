@@ -1,8 +1,8 @@
 #include "obstacle.h"
 
-Obstacle::Obstacle(int x, int y, int width, int height)
-    : rect(x, y, width, height), speed(5)
 
+Obstacle::Obstacle(int x, int y, int width, int height)
+    : rect{x, y, width, height}, speed{5}
 {}
 
 void Obstacle::move()

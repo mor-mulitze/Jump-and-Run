@@ -1,8 +1,6 @@
-
-
-
 #include <QApplication>
 #include "gamewindow.h"
+
 
 int main(int argc, char *argv[])
 {

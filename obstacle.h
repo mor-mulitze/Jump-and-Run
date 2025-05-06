@@ -5,6 +5,7 @@
 
 //QRect ist etwas von Qt selbst
 
+
 class Obstacle
 {
 public:
