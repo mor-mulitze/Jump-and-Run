@@ -97,6 +97,7 @@ void GameWindow::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
+
 void GameWindow::timerEvent(QTimerEvent *event)
 {
     if (gamePaused) {
@@ -107,6 +108,28 @@ void GameWindow::timerEvent(QTimerEvent *event)
 
         geschwindigkeitY += 1;          // Schwerkraft anwenden (angepasst)
     }
+
+
+    QRect playerRect(viereckX, viereckY, viereckB, viereckH);
+    QRect nextPlayerRect(viereckX, viereckY + geschwindigkeitY, viereckB, viereckH);
+
+    // Nur wenn der Spieler wirklich von OBEN kommt:
+    bool istOberhalb = playerRect.bottom() <= plattform.top();
+    bool faelltNachUnten = geschwindigkeitY > 0;
+    bool trifftHorizontal = nextPlayerRect.right() > plattform.left() &&
+                            nextPlayerRect.left() < plattform.right();
+    bool trifftVertikal = nextPlayerRect.bottom() >= plattform.top() &&
+                          nextPlayerRect.top() < plattform.top() + plattform.height();
+
+    if (istOberhalb && faelltNachUnten && trifftHorizontal && trifftVertikal) {
+        viereckY = plattform.y() - viereckH;  // Oben aufsetzen
+        geschwindigkeitY = 0;
+        onGround = true;
+        isJumping = false;
+    } else {
+        onGround = false;
+    }
+
 
     viereckY += geschwindigkeitY;
     viereckX += geschwindigkeitX;
@@ -130,7 +153,7 @@ void GameWindow::timerEvent(QTimerEvent *event)
         obstacle.move();                         // Bewege das Hindernis
         obstacle.reset(width(), height());       // Setze es neu, wenn es den Bildschirm verlässt
     }
-
+/*
     QRect playerRect(viereckX, viereckY, viereckB, viereckH);
 
     if (playerRect.intersects(plattform) && geschwindigkeitY > 0) {
@@ -138,6 +161,8 @@ void GameWindow::timerEvent(QTimerEvent *event)
         onGround = true;
         geschwindigkeitY = 0;
         isJumping = false;}
+
+ */
     // Überprüfe jede Kollision
     for (const Obstacle &obstacle : obstacles) {
         if (checkCollisionPixelBased(playerRect, obstacle)) {
@@ -146,6 +171,26 @@ void GameWindow::timerEvent(QTimerEvent *event)
             gamePaused = true;  // Spiel pausieren
             handleCollision(playerRect, obstacle); // Kollision behandeln
         }
+    }
+
+    if (playerRect.intersects(plattform) && geschwindigkeitY > 0) {
+        viereckY = plattform.y() - viereckH; // Spieler landet auf Plattform
+        onGround = true;
+        geschwindigkeitY = 0;
+        isJumping = false;
+    }
+
+
+    if (playerRect.bottom() <= plattform.top() + 5 &&
+        playerRect.intersects(plattform) &&
+        geschwindigkeitY >= 0) {
+        viereckY = plattform.y() - viereckH;
+        onGround = true;
+        geschwindigkeitY = 0;
+        isJumping = false;
+    } else if (viereckY + viereckH < height() - 50) {
+        // Wenn der Spieler nicht den Boden berührt: Er ist in der Luft
+        onGround = false;
     }
 
     update();
