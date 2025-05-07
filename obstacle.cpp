@@ -1,7 +1,7 @@
 #include "obstacle.h"
 
 Obstacle::Obstacle(int x, int y, int width, int height)
-    : rect(x, y, width, height), speed(5)
+    : rect(x, y, width, height), speed(5)  //speed 1 zum debuggen orginal speed 5!!
 
 {}
 
