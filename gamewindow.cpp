@@ -74,9 +74,9 @@ void GameWindow::paintEvent(QPaintEvent *event)
     Farbe.drawText(width() - textBreite - 10, 30, zeitText);
 
     // 🆕 Zeichne Plattformen (blaue Rechtecke)
-    Farbe.setBrush(Qt::blue);
-    for (const QRect &plattform : plattformen) {
-        Farbe.drawRect(plattform);
+        QPixmap plattformImage(":/graphics/Plattformen/Erde-mittig.png");
+        for (const QRect &plattform : plattformen) {
+        Farbe.drawPixmap(plattform, plattformImage);
     }
 }
 
