@@ -37,12 +37,12 @@ void GameWindow::paintEvent(QPaintEvent *event)
     QPixmap background(":/graphics/Background/Background_v2-1.png"); // Hier wird das Bild aus Ressourcen geladen
     Farbe.drawPixmap(0, 0, width(), height(), background); // Das Bild wird auf die ganze Fenstergröße skaliert
 
-    // Zeichne den Spieler (grünes Rechteck)
-    Farbe.setBrush(Qt::green);
-    Farbe.drawRect(viereckX, viereckY, viereckB, viereckH);
+    // Spielerbild laden
+    QPixmap playerImage(":/graphics/Character/stand-still_v1-1.png");
+    Farbe.drawPixmap(viereckX, viereckY, viereckB, viereckH, playerImage);
 
-    // Zeichne Hindernisse (rote Rechtecke)
-    Farbe.setBrush(Qt::red);
+    // Zeichne Hindernisse (grüne Rechtecke)
+    Farbe.setBrush(Qt::green);
     for (const Obstacle &obstacle : obstacles) {
         Farbe.drawRect(obstacle.getRect());
     }
