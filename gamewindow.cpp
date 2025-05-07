@@ -124,6 +124,74 @@ void GameWindow::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
+/*
+void GameWindow::timerEvent(QTimerEvent *event)
+{
+    if (gamePaused) return;
+
+    // === Schwerkraft anwenden ===
+    geschwindigkeitY += 1;  // einfache Gravitation
+
+    // Aktuelle Positionen
+    QRect playerRect(viereckX, viereckY, viereckB, viereckH);
+    QRect nextRect = playerRect.translated(0, geschwindigkeitY);
+
+    // === Plattform-Kollision: nur von OBEN landen ===
+    bool trifftPlattform = nextRect.intersects(plattform);
+    bool kommtVonOben = playerRect.bottom() <= plattform.top() && geschwindigkeitY > 0;
+
+    if (trifftPlattform && kommtVonOben) {
+        viereckY = plattform.y() - viereckH;  // direkt auf Plattform landen
+        geschwindigkeitY = 0;
+        onGround = true;
+        isJumping = false;
+    }
+    // === Blockiere von UNTEN ===
+    else if (trifftPlattform && playerRect.top() >= plattform.bottom() && geschwindigkeitY < 0) {
+        viereckY = plattform.bottom();
+        geschwindigkeitY = 0;
+    }
+    else {
+        onGround = false;
+    }
+
+    // === Position aktualisieren ===
+    viereckY += geschwindigkeitY;
+    viereckX += geschwindigkeitX;
+
+    // Bildschirmbegrenzung (links/rechts)
+    if (viereckX < 0) viereckX = 0;
+    if (viereckX > width() - viereckB) viereckX = width() - viereckB;
+
+    // === Boden-Kollision ===
+    if (viereckY >= height() - 50) {
+        viereckY = height() - 50;
+        geschwindigkeitY = 0;
+        onGround = true;
+        isJumping = false;
+    }
+
+    // === Hindernisse bewegen ===
+    for (Obstacle &obstacle : obstacles) {
+        obstacle.move();
+        obstacle.reset(width(), height());
+    }
+
+    // === Hindernis-Kollision prüfen ===
+    QRect aktuellerRect(viereckX, viereckY, viereckB, viereckH);
+    for (const Obstacle &obstacle : obstacles) {
+        if (checkCollisionPixelBased(aktuellerRect, obstacle)) {
+            qDebug() << "💥 Kollision erkannt!";
+            gamePaused = true;
+            handleCollision(aktuellerRect, obstacle);
+        }
+    }
+
+    update();
+}
+*/
+
+
 
 void GameWindow::timerEvent(QTimerEvent *event)
 {
@@ -140,12 +208,12 @@ void GameWindow::timerEvent(QTimerEvent *event)
     QRect nextPlayerRect(viereckX, viereckY + geschwindigkeitY, viereckB, viereckH);
 
     // Nur wenn der Spieler wirklich von OBEN kommt:
-    bool istOberhalb = playerRect.bottom() <= plattform.top();
-    bool faelltNachUnten = geschwindigkeitY > 0;
-    bool trifftHorizontal = nextPlayerRect.right() > plattform.left() &&
-                            nextPlayerRect.left() < plattform.right();
-    bool trifftVertikal = nextPlayerRect.bottom() >= plattform.top() &&
-                          nextPlayerRect.top() < plattform.top() + plattform.height();
+    bool istOberhalb = (playerRect.bottom() <= plattform.top());
+    bool faelltNachUnten = (geschwindigkeitY > 0);
+    bool trifftHorizontal = (nextPlayerRect.right() > plattform.left() &&
+                            nextPlayerRect.left() < plattform.right());
+    bool trifftVertikal = (nextPlayerRect.bottom() >= plattform.top() &&
+                          nextPlayerRect.top() < plattform.top() + plattform.height());
 
     if (istOberhalb && faelltNachUnten && trifftHorizontal && trifftVertikal) {
         viereckY = plattform.y() - viereckH;  // Oben aufsetzen
@@ -211,7 +279,9 @@ void GameWindow::timerEvent(QTimerEvent *event)
         }
     }
 
+    qDebug() << "geschwindigkeitY: " << geschwindigkeitY;
     if (playerRect.intersects(plattform) && geschwindigkeitY > 0) {
+        qDebug() << "💥 Kollision mt Platform erkannt!";
         viereckY = plattform.y() - viereckH; // Spieler landet auf Plattform
         onGround = true;
         geschwindigkeitY = 0;
@@ -233,6 +303,7 @@ void GameWindow::timerEvent(QTimerEvent *event)
 
     update();
 }
+
 
 bool GameWindow::checkCollisionPixelBased(const QRect &playerRect, const Obstacle &obstacle)
 {
