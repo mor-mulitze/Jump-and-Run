@@ -11,5 +11,6 @@
         <file>graphics/Ground/rechts.png</file>
         <file>graphics/Objects/Kojote_v1-1-Dank-an-Bohn.png</file>
         <file>graphics/Spieler/stand-still_v1-1.png</file>
+        <file>graphics/Gegner/Kojote_v1-1.png</file>
     </qresource>
 </RCC>
