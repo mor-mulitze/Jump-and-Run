@@ -27,6 +27,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         gamewindow.cpp
         obstacle.h obstacle.cpp
         resources.qrc
+        mainmenu.h mainmenu.cpp
+        scorewindow.h scorewindow.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
