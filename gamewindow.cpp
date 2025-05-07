@@ -38,14 +38,16 @@ void GameWindow::paintEvent(QPaintEvent *event)
     Farbe.drawPixmap(0, 0, width(), height(), background); // Das Bild wird auf die ganze Fenstergröße skaliert
 
     // Spielerbild laden
-    QPixmap playerImage(":/graphics/Character/stand-still_v1-1.png");
+    QPixmap playerImage(":/graphics/Spieler/stand-still_v1-1.png");
     Farbe.drawPixmap(viereckX, viereckY, viereckB, viereckH, playerImage);
 
-    // Zeichne Hindernisse (grüne Rechtecke)
-    Farbe.setBrush(Qt::green);
+    // Gegnerbild laden
+    QPixmap obstacleImage(":/graphics/Gegner/Kojote_v1-1.png");
     for (const Obstacle &obstacle : obstacles) {
-        Farbe.drawRect(obstacle.getRect());
+    QRect rect = obstacle.getRect();
+    Farbe.drawPixmap(rect, obstacleImage);
     }
+
 
     if (gamePaused) {
         // Setzt eine transparente Farbe für das Overlay
