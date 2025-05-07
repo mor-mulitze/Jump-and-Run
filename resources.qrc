@@ -5,5 +5,11 @@
         <file>graphics/Character/stand-still_v1-1.png</file>
         <file>graphics/Background/Background_v2-0.png</file>
         <file>graphics/Background/Background_v2-1.png</file>
+        <file>graphics/Character/standstill_v2-0.png</file>
+        <file>graphics/Ground/links.png</file>
+        <file>graphics/Ground/mitte.png</file>
+        <file>graphics/Ground/rechts.png</file>
+        <file>graphics/Objects/Kojote_v1-1-Dank-an-Bohn.png</file>
+        <file>graphics/Spieler/stand-still_v1-1.png</file>
     </qresource>
 </RCC>
