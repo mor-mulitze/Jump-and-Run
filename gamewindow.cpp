@@ -10,16 +10,18 @@
 #include <QRandomGenerator>  // Für moderne Zufallszahlen
 
 
+const int GROUND_Y = 437; // Einheitliche Bodenhöhe für Hindernisse
+
 GameWindow::GameWindow(QWidget *parent)
     : QWidget(parent),
-    viereckX(100), viereckY(500), viereckB(50), viereckH(50), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0), gamePaused(false)
+    viereckX(100), viereckY(400), viereckB(100), viereckH(100), isJumping(false), geschwindigkeitY(3), onGround(true), geschwindigkeitX(0), gamePaused(false)
 {
     setFixedSize(1024, 512);        // Setzt die Fenstergröße
     startTimer(15);                  // wie schnell das Spiel ist
     spielTimer.start();             // Timer wird getartet
 
     // Initiales Hindernis
-    obstacles.append(Obstacle(500, 512, 50, 50));
+    obstacles.append(Obstacle(500, GROUND_Y, 75, 75));
 
     // 🆕 Erste Plattform zufällig erzeugen (breiter & nicht zu hoch)
     int breite = 150 + QRandomGenerator::global()->bounded(100); // 150–249 px
@@ -74,9 +76,9 @@ void GameWindow::paintEvent(QPaintEvent *event)
     Farbe.drawText(width() - textBreite - 10, 30, zeitText);
 
     // 🆕 Zeichne Plattformen (blaue Rechtecke)
-    Farbe.setBrush(Qt::blue);
-    for (const QRect &plattform : plattformen) {
-        Farbe.drawRect(plattform);
+        QPixmap plattformImage(":/graphics/Plattformen/Erde-mittig.png");
+        for (const QRect &plattform : plattformen) {
+        Farbe.drawPixmap(plattform, plattformImage);
     }
 }
 
@@ -140,8 +142,8 @@ void GameWindow::timerEvent(QTimerEvent *event)
     if (viereckX > width() - viereckB) viereckX = width() - viereckB;
 
     // Überprüfen, ob der Spieler den Boden berührt
-    if (viereckY >= height() - 50) {
-        viereckY = height() - 50;       // Das Viereck darf nicht unter den Boden gehen
+    if (viereckY >= height() - 100) {
+        viereckY = height() - 100;       // Das Viereck darf nicht unter den Boden gehen
         onGround = true;                // Es steht jetzt auf dem Boden
         geschwindigkeitY = 0;           // Stoppe die Bewegung in Y-Richtung
         isJumping = false;              // Jetzt kann wieder gesprungen werden
